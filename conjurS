@@ -1,0 +1,40 @@
+#!/bin/bash
+
+
+createNetrc()
+{
+apikey=$(/opt/CARKaim/sdk/clipasswordsdk GetPassword -p AppDescs.AppID=MyApp -p Query="Safe=ConjurCLI;Folder=Root;Object=Application-CyberArkConjur-conjur-admin" -o password)
+
+cat > ~/.netrc << EOF
+machine http://172.18.0.3/authn
+  login admin
+  password $apikey
+EOF
+chmod 600 ~/.netrc
+}
+
+removeNetrc()
+{
+rm -f ~/.netrc
+}
+
+###########
+#  Main
+#
+
+# Update password for conjur cli after `conjur authn login`
+if [ "$1" == "authn" -a "$2" == "login" ]; then
+        echo "Securing .netrc"
+        #
+        # TODO:
+        # 1. perform `conjur authn login`
+        # 2. parse .netrc file and get `password`
+        # 3. Upload password to Vault or AIM CP cache
+        # 4. remove .netrc file
+fi
+
+createNetrc
+
+/usr/local/rvm/gems/ruby-2.6.0/bin/conjur ${*:1}
+
+removeNetrc
